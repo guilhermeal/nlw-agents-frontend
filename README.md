@@ -1,69 +1,130 @@
-# React + TypeScript + Vite
+# NLW Agents - Let me Ask
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação web desenvolvida durante o evento **NLW Agents** da [Rocketseat](https://rocketseat.com.br), focada em criar uma plataforma para criação e gerenciamento de salas de Q&A (perguntas e respostas).
 
-Currently, two official plugins are available:
+## 🚀 Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Este projeto foi construído com as seguintes tecnologias:
 
-## Expanding the ESLint configuration
+### Core
+- **React 19** - Biblioteca JavaScript para construção de interfaces
+- **TypeScript** - Superset do JavaScript com tipagem estática
+- **Vite** - Bundler e ferramenta de desenvolvimento rápida
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Estilização
+- **Tailwind CSS 4** - Framework CSS utility-first
+- **Radix UI** - Componentes acessíveis e sem estilo
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Estado e Roteamento
+- **TanStack Query (React Query)** - Gerenciamento de estado server-side
+- **React Router DOM** - Roteamento SPA
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Utilitários
+- **Lucide React** - Biblioteca de ícones
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 📁 Estrutura do Projeto
+
+```
+src/
+├── components/
+│   └── ui/
+│       └── button.tsx      # Componente Button reutilizável
+├── lib/
+│   └── utils.ts           # Utilitários (função cn)
+├── pages/
+│   ├── create-room.tsx    # Página de listagem/criação de salas
+│   └── room.tsx           # Página de detalhes da sala
+├── app.tsx                # Componente principal com roteamento
+├── main.tsx               # Ponto de entrada da aplicação
+└── index.css              # Estilos globais e tema
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🛠️ Padrões de Projeto
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Arquitetura
+- **Component-Based Architecture** com React
+- **Page-based Routing** usando React Router
+- **Compound Component Pattern** para componentes UI
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Organização de Código
+- **Barrel Exports** para componentes
+- **Type-safe Props** com TypeScript
+- **Path Mapping** (`@/*`) para imports absolutos
+- **CSS-in-CSS** com Tailwind CSS
+
+### Gerenciamento de Estado
+- **Server State** gerenciado com TanStack Query
+- **Client State** usando React hooks nativos
+
+## ⚙️ Configuração e Setup
+
+### Pré-requisitos
+- Node.js (versão 18+)
+- npm, yarn ou pnpm
+
+### Instalação
+
+1. Clone o repositório:
+```bash
+git clone <repository-url>
+cd web
 ```
+
+2. Instale as dependências:
+```bash
+npm install
+# ou
+yarn install
+# ou
+pnpm install
+```
+
+3. Configure o arquivo `.env` (se necessário):
+```bash
+# Adicione variáveis de ambiente se houver
+```
+
+### Scripts Disponíveis
+
+```bash
+# Desenvolvimento
+npm run dev
+
+# Build para produção
+npm run build
+
+# Preview da build
+npm run preview
+```
+
+### Backend
+A aplicação espera uma API rodando em `http://localhost:3333` com os seguintes endpoints:
+- `GET /rooms` - Lista todas as salas
+
+## 🎨 Componentes UI
+
+O projeto utiliza um sistema de componentes baseado no **shadcn/ui** com:
+- Variantes customizáveis com `class-variance-authority`
+- Tema escuro/claro configurado via CSS variables
+- Componentes acessíveis com Radix UI
+
+### Exemplo de uso:
+```tsx
+import { Button } from "@/components/ui/button"
+
+<Button variant="outline" size="lg">
+  Meu Botão
+</Button>
+```
+
+## 📋 Funcionalidades
+
+- ✅ Listagem de salas disponíveis
+- ✅ Navegação entre páginas
+- ✅ Interface responsiva
+- ✅ Tema escuro/claro
+- ✅ Componentes reutilizáveis
+
+---
+
+Desenvolvido com 💜 durante o **NLW Agents** da **Rocketseat**
