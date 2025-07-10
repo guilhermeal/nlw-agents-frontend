@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 type GetAPIRoomsResponse = Array<{
   id: string;
   name: string;
+  questionsCount: number;
 }>;
 
 export const CreateRoom = () => {
@@ -24,14 +24,22 @@ export const CreateRoom = () => {
 
       {isLoading && <p>Loading rooms...</p>}
 
-      <div className="flex flex-col">
-        {data?.map((room) => {
-          return (
-            <Button variant={"link"} key={room.id} title={room.id}>
-              <Link to={`/room/${room.id}`}>{room.name}</Link>
-            </Button>
-          );
-        })}
+      <div className="container mx-auto p-4 text-sm">
+        <ol className="list-decimal">
+          {data?.map((room) => {
+            return (
+              <li key={room.id} title={room.id} className="my-2">
+                <Link
+                  key={room.id}
+                  title={`Room ID: ${room.id}`}
+                  to={`/room/${room.id}`}
+                >
+                  {`${room.name} (${room.questionsCount})`}
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </div>
   );
