@@ -31,7 +31,7 @@ export const RoomList = () => {
           return (
             <Link
               key={room.id}
-              to={`/rooms/${room.id}`}
+              to={`/room/${room.id}`}
               className="flex items-center justify-between rounded-lg border p-3 hover:bg-accent/30"
             >
               <div className="flex flex-1 flex-col gap-1">

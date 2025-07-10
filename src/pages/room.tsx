@@ -1,8 +1,11 @@
+import { ArrowLeft, Radio } from "lucide-react";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { QuestionForm } from "@/components/question-form";
+import { QuestionItem } from "@/components/question-item";
 import { useQuery } from "@tanstack/react-query";
-import { useParams, Navigate, Link } from "react-router-dom";
 
-type RommParams = {
+type RoomParams = {
   roomId: string;
 };
 
@@ -21,11 +24,10 @@ type GetAPIRoomsResponse = Array<{
 }>;
 
 export const Room = () => {
-  const params = useParams<RommParams>();
+  const params = useParams<RoomParams>();
 
-  if (!params.roomId || params.roomId.length === 0 || params.roomId === "") {
-    console.log("Room params vazio:");
-    return <Navigate to="/" replace />;
+  if (!params.roomId) {
+    return <Navigate replace to="/" />;
   }
 
   const { data, isLoading } = useQuery({
@@ -45,29 +47,50 @@ export const Room = () => {
   if (isLoading) {
     return <p>Loading data room...</p>;
   }
-
   return (
-    <div>
-      <strong>Room details</strong>
-      <p>Room ID: {params.roomId}</p>
-      <div className="flex flex-col mt-5">
-        <p className="font-bold mb-5">Perguntas: ({data?.questionsCount})</p>
-        <div className="container mx-auto p-4 text-sm">
-          <ol className="list-decimal">
-            {questions.map((question: Question) => {
-              return (
-                <li key={question.id} title={question.id} className="my-2">
-                  {question.question}
-                </li>
-              );
-            })}
-          </ol>
+    <div className="min-h-screen bg-zinc-950">
+      <div className="container mx-auto max-w-4xl px-4 py-8">
+        <div className="mb-8">
+          <div className="mb-4 flex items-center justify-between">
+            <Link to="/">
+              <Button variant="outline">
+                <ArrowLeft className="mr-2 size-4" />
+                Voltar ao Início
+              </Button>
+            </Link>
+            <Link to={`/room/${params.roomId}/audio`}>
+              <Button className="flex items-center gap-2" variant="secondary">
+                <Radio className="size-4" />
+                Gravar Áudio
+              </Button>
+            </Link>
+          </div>
+          <h1 className="mb-2 font-bold text-3xl text-foreground">
+            Sala de Perguntas
+          </h1>
+          <p className="text-muted-foreground">
+            Faça perguntas e receba respostas com IA
+          </p>
+        </div>
+
+        <div className="mb-8">
+          <QuestionForm roomId={params.roomId} />
+        </div>
+
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-2xl text-foreground">
+              Perguntas & Respostas
+            </h2>
+          </div>
+
+          {questions.map((question: Question) => {
+            return (
+              <QuestionItem question={{ ...question, answer: undefined }} />
+            );
+          })}
         </div>
       </div>
-
-      <Button asChild>
-        <Link to="/">Voltar</Link>
-      </Button>
     </div>
   );
 };
