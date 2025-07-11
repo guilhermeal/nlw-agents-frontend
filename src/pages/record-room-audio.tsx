@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CirclePause, Loader, LoaderCircle, Radio } from "lucide-react";
+import { CirclePause, LoaderCircle, Radio } from "lucide-react";
 import { useRef, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
@@ -17,39 +17,7 @@ export const RecordRoomAudio = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const recorder = useRef<MediaRecorder | null>(null);
-
-  const stopRecording = () => {
-    setIsRecording(false);
-
-    if (recorder.current && recorder.current.state !== "inactive") {
-      recorder.current.stop();
-    }
-  };
-
-  const uploadAudio = async (audio: Blob) => {
-    setIsLoading(true);
-    try {
-      const formData = new FormData();
-
-      formData.append("file", audio, "audio.webm");
-
-      await fetch(
-        `http://localhost:3333/rooms/${params.roomId}/audio`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      // const result = await response.json();
-
-      // console.log(result);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const intervalRef = useRef<NodeJS.Timeout>(null);
 
   const startRecording = async () => {
     if (!isRecordingSupported) {
@@ -67,6 +35,28 @@ export const RecordRoomAudio = () => {
       },
     });
 
+    createRecorder(audio);
+
+    intervalRef.current = setInterval(() => {
+      recorder.current?.stop();
+
+      createRecorder(audio)
+    }, 10000);
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+
+    if (recorder.current && recorder.current.state !== "inactive") {
+      recorder.current.stop();
+    }
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
+
+  const createRecorder = (audio: MediaStream) => {
     recorder.current = new MediaRecorder(audio, {
       mimeType: "audio/webm",
       audioBitsPerSecond: 64_000,
@@ -88,6 +78,28 @@ export const RecordRoomAudio = () => {
     };
 
     recorder.current.start();
+  };
+
+  const uploadAudio = async (audio: Blob) => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+
+      formData.append("file", audio, "audio.webm");
+
+      await fetch(`http://localhost:3333/rooms/${params.roomId}/audio`, {
+        method: "POST",
+        body: formData,
+      });
+
+      // const result = await response.json();
+
+      // console.log(result);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!params.roomId) {
