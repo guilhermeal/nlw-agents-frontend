@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreateQuestion } from "@/http/use-create-question";
+import { LoaderCircle, MessageSquareMore } from "lucide-react";
 
 // Esquema de validação no mesmo arquivo conforme solicitado
 const createQuestionSchema = z.object({
@@ -45,8 +46,16 @@ export function QuestionForm({ roomId }: QuestionFormProps) {
     },
   });
 
+  const { isSubmitting } = form.formState;
+
   const handleCreateQuestion = async (data: CreateQuestionFormData) => {
-    await createQuestion(data);
+    try {
+      await createQuestion(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      form.reset();
+    }
   };
 
   return (
@@ -73,6 +82,7 @@ export function QuestionForm({ roomId }: QuestionFormProps) {
                     <Textarea
                       className="min-h-[100px]"
                       placeholder="O que você gostaria de saber?"
+                      disabled={isSubmitting}
                       {...field}
                     />
                   </FormControl>
@@ -81,8 +91,24 @@ export function QuestionForm({ roomId }: QuestionFormProps) {
               )}
             />
 
-            <Button type="submit" className="cursor-pointer">
-              Enviar pergunta
+            <Button
+              type="submit"
+              className="cursor-pointer"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <LoaderCircle className="size-4 animate-spin" />
+                  <p className={isSubmitting && "animate-pulse"}>
+                    Processando. Aguarde...
+                  </p>
+                </>
+              ) : (
+                <>
+                  <MessageSquareMore className="size-4" />
+                  <p>Enviar pergunta</p>
+                </>
+              )}
             </Button>
           </form>
         </Form>

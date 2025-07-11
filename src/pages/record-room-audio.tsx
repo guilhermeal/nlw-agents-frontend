@@ -112,7 +112,7 @@ export const RecordRoomAudio = () => {
         >
           {isLoading ? (
             <>
-              <LoaderCircle className="size-4 animate-spin h-5 w-5 mr-2" />
+              <LoaderCircle className="size-4 animate-spin" />
               <p className={isLoading && "animate-pulse"}>Processando...</p>
             </>
           ) : (
