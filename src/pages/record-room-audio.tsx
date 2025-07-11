@@ -1,7 +1,9 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CirclePause, LoaderCircle, Radio } from "lucide-react";
-import { useRef, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import { formatTime } from "@/utils/format-date-time";
+import { ArrowLeft, CirclePause, LoaderCircle, Mic, Radio } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Link, Navigate, useParams } from "react-router-dom";
 
 const isRecordingSupported =
   !!navigator.mediaDevices &&
@@ -16,8 +18,29 @@ export const RecordRoomAudio = () => {
   const params = useParams<RoomParams>();
   const [isRecording, setIsRecording] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
   const recorder = useRef<MediaRecorder | null>(null);
   const intervalRef = useRef<NodeJS.Timeout>(null);
+
+  if (!params.roomId) {
+    return <Navigate replace to="/" />;
+  }
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingTime((time) => time + 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isRecording]);
 
   const startRecording = async () => {
     if (!isRecordingSupported) {
@@ -39,13 +62,13 @@ export const RecordRoomAudio = () => {
 
     intervalRef.current = setInterval(() => {
       recorder.current?.stop();
-
-      createRecorder(audio)
+      createRecorder(audio);
     }, 10000);
   };
 
   const stopRecording = () => {
     setIsRecording(false);
+    setRecordingTime(0);
 
     if (recorder.current && recorder.current.state !== "inactive") {
       recorder.current.stop();
@@ -64,17 +87,8 @@ export const RecordRoomAudio = () => {
 
     recorder.current.ondataavailable = (event) => {
       if (event.data.size > 0) {
-        console.log(event.data);
         uploadAudio(event.data);
       }
-    };
-
-    recorder.current.onstart = () => {
-      console.log("Gravacao iniciada...");
-    };
-
-    recorder.current.onstop = () => {
-      console.log("Gravacao pausada...");
     };
 
     recorder.current.start();
@@ -91,10 +105,6 @@ export const RecordRoomAudio = () => {
         method: "POST",
         body: formData,
       });
-
-      // const result = await response.json();
-
-      // console.log(result);
     } catch (error) {
       console.error(error);
     } finally {
@@ -102,46 +112,78 @@ export const RecordRoomAudio = () => {
     }
   };
 
-  if (!params.roomId) {
-    return <Navigate replace to="/" />;
-  }
-
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-3">
-      {isRecording ? (
-        <Button
-          onClick={stopRecording}
-          className="cursor-pointer bg-red-600 animate-pulse text-zinc-100"
-        >
-          <CirclePause className="size-4" />
-          Clique para finalizar a gravação
-        </Button>
-      ) : (
-        <Button
-          onClick={startRecording}
-          disabled={isLoading}
-          className="cursor-pointer"
-        >
-          {isLoading ? (
-            <>
-              <LoaderCircle className="size-4 animate-spin" />
-              <p className={isLoading && "animate-pulse"}>Processando...</p>
-            </>
-          ) : (
-            <>
-              <Radio className="size-4" />
-              Iniciar gravação de áudio
-            </>
-          )}
-        </Button>
-      )}
-      {isLoading ? (
-        <div>Por favor, aguarde...</div>
-      ) : isRecording ? (
-        <div>Gravando seu áudio...</div>
-      ) : (
-        <div>Pausado</div>
-      )}
+    <div className="min-h-screen bg-zinc-950">
+      <div className="container mx-auto max-w-4xl px-4 py-8">
+        <div className="mb-8">
+          <div className="mb-4 flex items-center justify-between">
+            <Link to={`/room/${params.roomId}`}>
+              <Button variant="outline" className="cursor-pointer">
+                <ArrowLeft className="mr-2 size-4" />
+                Voltar para sala
+              </Button>
+            </Link>
+          </div>
+          <h1 className="mb-2 font-bold text-3xl text-foreground">
+            Studio de gravação
+          </h1>
+          <p className="text-muted-foreground">
+            Use o botão abaixo para Iniciar e Parar a gravação do áudio da aula
+          </p>
+
+          <div className="flex flex-col items-center justify-center gap-3 mt-[50%]">
+            {isRecording ? (
+              <Button
+                onClick={stopRecording}
+                className="cursor-pointer bg-red-600 hover:bg-zinc-500  text-zinc-100"
+              >
+                <CirclePause className="size-4" />
+                Clique para finalizar a gravação
+                <Badge variant="default" className="font-mono">
+                  <Mic className="size-8 animate-ping mr-1" color="#ff0000" />
+                  {formatTime(recordingTime)}
+                </Badge>
+              </Button>
+            ) : (
+              <Button
+                onClick={startRecording}
+                disabled={isLoading}
+                className="cursor-pointer"
+              >
+                {isLoading ? (
+                  <>
+                    <LoaderCircle className="size-4 animate-spin" />
+                    <p className="animate-pulse">Processando...</p>
+                  </>
+                ) : (
+                  <>
+                    <Mic className="size-4" />
+                    Iniciar gravação de áudio
+                  </>
+                )}
+              </Button>
+            )}
+
+            {isRecording && (
+              <div className="flex flex-col items-center gap-2">
+                <div className="text-sm text-muted-foreground">
+                  Gravando seu áudio...
+                </div>
+              </div>
+            )}
+
+            {isLoading && !isRecording && (
+              <div className="text-sm text-muted-foreground">
+                Por favor, aguarde...
+              </div>
+            )}
+
+            {!isRecording && !isLoading && (
+              <div className="text-sm text-muted-foreground">Pausado</div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
