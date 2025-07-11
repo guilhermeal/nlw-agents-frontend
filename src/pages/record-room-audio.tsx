@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { CirclePause, Radio } from "lucide-react";
+import { CirclePause, Loader, LoaderCircle, Radio } from "lucide-react";
 import { useRef, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
@@ -15,6 +15,7 @@ type RoomParams = {
 export const RecordRoomAudio = () => {
   const params = useParams<RoomParams>();
   const [isRecording, setIsRecording] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const recorder = useRef<MediaRecorder | null>(null);
 
   const stopRecording = () => {
@@ -26,21 +27,28 @@ export const RecordRoomAudio = () => {
   };
 
   const uploadAudio = async (audio: Blob) => {
-    const formData = new FormData();
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
 
-    formData.append("file", audio, "audio.webm");
+      formData.append("file", audio, "audio.webm");
 
-    const response = await fetch(
-      `http://localhost:3333/rooms/${params.roomId}/audio`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+      await fetch(
+        `http://localhost:3333/rooms/${params.roomId}/audio`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-    const result = await response.json();
+      // const result = await response.json();
 
-    console.log(result);
+      // console.log(result);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const startRecording = async () => {
@@ -94,15 +102,34 @@ export const RecordRoomAudio = () => {
           className="cursor-pointer bg-red-600 animate-pulse text-zinc-100"
         >
           <CirclePause className="size-4" />
-          Pausar gravação
+          Clique para finalizar a gravação
         </Button>
       ) : (
-        <Button onClick={startRecording} className="cursor-pointer">
-          <Radio className="size-4" />
-          Gravar áudio
+        <Button
+          onClick={startRecording}
+          disabled={isLoading}
+          className="cursor-pointer"
+        >
+          {isLoading ? (
+            <>
+              <LoaderCircle className="size-4 animate-spin h-5 w-5 mr-2" />
+              <p className={isLoading && "animate-pulse"}>Processando...</p>
+            </>
+          ) : (
+            <>
+              <Radio className="size-4" />
+              Iniciar gravação de áudio
+            </>
+          )}
         </Button>
       )}
-      {isRecording ? <div>Gravando seu áudio...</div> : <div>Pausado</div>}
+      {isLoading ? (
+        <div>Por favor, aguarde...</div>
+      ) : isRecording ? (
+        <div>Gravando seu áudio...</div>
+      ) : (
+        <div>Pausado</div>
+      )}
     </div>
   );
 };
