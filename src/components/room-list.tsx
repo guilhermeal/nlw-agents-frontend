@@ -27,6 +27,12 @@ export const RoomList = () => {
           <p className="text-muted-foreground text-sm">Carregando salas...</p>
         )}
 
+        {!data && (
+          <p className="text-muted-foreground text-sm">
+            Nenhuma salas encontrada
+          </p>
+        )}
+
         {data?.map((room) => {
           return (
             <Link
