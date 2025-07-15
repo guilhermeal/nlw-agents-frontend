@@ -1,4 +1,4 @@
-import { env } from "@/env";
+import { apiUrl } from "@/env";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CreateQuestionRequest } from "./types/create-question-request";
 import type { CreateQuestionResponse } from "./types/create-question-response";
@@ -9,16 +9,13 @@ export function useCreateQuestion(roomId: string) {
 
   return useMutation({
     mutationFn: async (data: CreateQuestionRequest) => {
-      const response = await fetch(
-        `http://${env.API_HOST}:${env.API_PORT}/rooms/${roomId}/questions`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const response = await fetch(`${apiUrl}/rooms/${roomId}/questions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       const result: CreateQuestionResponse = await response.json();
 
