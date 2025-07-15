@@ -9,4 +9,4 @@ const envSchema = z.object({
 export const env = envSchema.parse(import.meta.env);
 
 // Usage
-export const apiUrl = `http://${env.VITE_API_HOST}:${env.VITE_API_PORT}`;
+export const apiUrl = `${env.VITE_API_HOST}:${env.VITE_API_PORT}`;
