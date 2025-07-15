@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
-  VITE_API_PORT: z.coerce.number().default(80),
+  VITE_API_PORT: z.coerce.number(),
   VITE_API_HOST: z.string().default('http://localhost'),
+  VITE_API_AUTH_TOKEN: z.string(),
 });
 
 // ✅ Usar import.meta.env em vez de process.env
