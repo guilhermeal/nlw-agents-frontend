@@ -101,7 +101,7 @@ export const RecordRoomAudio = () => {
 
       formData.append("file", audio, "audio.webm");
 
-      await fetch(`http://localhost:3333/rooms/${params.roomId}/audio`, {
+      await fetch(`https://nlw-agents-backend.onrender.com/rooms/${params.roomId}/audio`, {
         method: "POST",
         body: formData,
       });
