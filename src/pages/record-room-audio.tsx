@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatTime } from "@/utils/format-date-time";
-import { ArrowLeft, CirclePause, LoaderCircle, Mic, Radio } from "lucide-react";
+import { ArrowLeft, CirclePause, LoaderCircle, Mic } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
