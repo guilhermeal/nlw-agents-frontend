@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { env } from "@/env";
 import { formatTime } from "@/utils/format-date-time";
 import { ArrowLeft, CirclePause, LoaderCircle, Mic } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -101,10 +102,13 @@ export const RecordRoomAudio = () => {
 
       formData.append("file", audio, "audio.webm");
 
-      await fetch(`http://localhost:3333/rooms/${params.roomId}/audio`, {
-        method: "POST",
-        body: formData,
-      });
+      await fetch(
+        `http://${env.API_HOST}:${env.API_PORT}/rooms/${params.roomId}/audio`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
     } catch (error) {
       console.error(error);
     } finally {
