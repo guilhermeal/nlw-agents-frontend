@@ -107,6 +107,7 @@ export const RecordRoomAudio = () => {
         body: formData,
         headers: {
           Authorization: `Bearer ${env.VITE_API_AUTH_TOKEN}`,
+          "Content-Type": "application/json",
         },
       });
     } catch (error) {
@@ -117,8 +118,8 @@ export const RecordRoomAudio = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950">
-      <div className="container mx-auto max-w-4xl px-4 py-8">
+    <div className="h-[90%] bg-zinc-950">
+      <div className="container mx-auto max-w-4xl px-4 pb-2">
         <div className="mb-8">
           <div className="mb-4 flex items-center justify-between">
             <Link to={`/room/${params.roomId}`}>
@@ -135,7 +136,7 @@ export const RecordRoomAudio = () => {
             Use o botão abaixo para Iniciar e Parar a gravação do áudio da aula
           </p>
 
-          <div className="flex flex-col items-center justify-center gap-3 mt-[50%]">
+          <div className="flex flex-col items-center justify-center gap-3 mt-[35%]">
             {isRecording ? (
               <Button
                 onClick={stopRecording}
