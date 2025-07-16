@@ -107,7 +107,6 @@ export const RecordRoomAudio = () => {
         body: formData,
         headers: {
           Authorization: `Bearer ${env.VITE_API_AUTH_TOKEN}`,
-          "Content-Type": "application/json",
         },
       });
     } catch (error) {
