@@ -1,7 +1,15 @@
 import { QuestionForm } from "@/components/question-form";
 import { QuestionList } from "@/components/question-list";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Radio } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useRoomSummary } from "@/http/use-room-summary";
+import {
+  ArrowLeft,
+  Loader2,
+  NotebookTabs,
+  Radio,
+  Sparkles,
+} from "lucide-react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
 type RoomParams = {
@@ -10,40 +18,91 @@ type RoomParams = {
 
 export const Room = () => {
   const params = useParams<RoomParams>();
+  const summaryMutation = useRoomSummary();
 
   if (!params.roomId) {
     return <Navigate replace to="/" />;
   }
 
+  const handleClickGetSummary = () => {
+    if (!params.roomId) {
+      return;
+    }
+    summaryMutation.mutate(params.roomId);
+  };
+
   return (
     <div className="h-[90%] bg-zinc-950">
       <div className="container mx-auto max-w-4xl px-4 pb-2">
-        <div className="mb-4">
-          <div className="mb-4 flex items-center justify-between">
-            <Link to="/">
-              <Button variant="outline" className="cursor-pointer">
-                <ArrowLeft className="mr-2 size-4" />
-                Voltar ao Início
-              </Button>
-            </Link>
+        {/* Header com botões */}
+        <div className="mb-4 flex items-center justify-between">
+          <Link to="/">
+            <Button variant="outline" className="cursor-pointer">
+              <ArrowLeft className="mr-2 size-4" />
+              Voltar ao Início
+            </Button>
+          </Link>
+
+          <div className="flex gap-2">
+            <Button
+              className="flex items-center gap-2 cursor-pointer"
+              variant="secondary"
+              onClick={handleClickGetSummary}
+              disabled={summaryMutation.isPending}
+            >
+              {summaryMutation.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <NotebookTabs className="size-4" />
+              )}
+              {summaryMutation.isPending ? "Gerando..." : "Gerar resumo"}
+            </Button>
+
             <Link to={`/room/${params.roomId}/audio`}>
-              <Button
-                className="flex items-center gap-2 cursor-pointer"
-                variant="secondary"
-              >
-                <Radio className="size-4" />
+              <Button variant="secondary">
+                <Radio className="size-4 mr-2" />
                 Gravar Áudio
               </Button>
             </Link>
           </div>
-          <h1 className="mb-2 font-bold text-3xl text-foreground">
-            Sala de Perguntas
-          </h1>
-          <p className="text-muted-foreground">
-            Faça perguntas e receba respostas com IA
-          </p>
         </div>
 
+        {summaryMutation.isPending && (
+          <div className="p-4 flex flex-col gap-2 bg-zinc-900 rounded-lg mb-6 animate-pulse">
+            <div className="flex gap-2 items-center">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <Skeleton className="h-6 w-48" />
+            </div>
+            <div className="px-4 space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+              <Skeleton className="h-4 w-4/5" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+          </div>
+        )}
+
+        {summaryMutation.data?.summary && (
+          <div className="p-4 flex flex-col gap-2 bg-zinc-900 rounded-lg mb-6">
+            <div className="flex gap-2 items-center">
+              <Sparkles className="size-5 text-yellow-400" />
+              <h3 className="font-bold text-lg">Resumo da aula gerado por IA:</h3>
+            </div>
+            <p className="px-4 text-muted-foreground italic">
+              {summaryMutation.data.summary}
+            </p>
+          </div>
+        )}
+
+        {summaryMutation.error && (
+          <div className="p-4 bg-red-900/20 border border-red-500 rounded-lg mb-6">
+            <p className="text-red-400">
+              Erro ao gerar resumo: {summaryMutation.error.message}
+            </p>
+          </div>
+        )}
+
+        {/* Resto do componente */}
         <div className="mb-8">
           <QuestionForm roomId={params.roomId} />
         </div>
